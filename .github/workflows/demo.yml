@@ -236,7 +236,7 @@ jobs:
         id: docker-action
         uses: ./action-docker
         with:
-          message: ${{ inputs.user-name }}
+          message: ${{ inputs.user-name || 'GitHub Actions Learner' }}
           process-type: ${{ inputs.docker-process }}
           color-output: 'true'
         # Notes about Docker actions:
