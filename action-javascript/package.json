@@ -1,0 +1,21 @@
+{
+  "name": "github-actions-javascript-demo",
+  "version": "1.0.0",
+  "description": "Educational JavaScript action demonstrating @actions/core and @actions/github",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"No tests defined yet - this is a demo action\" && exit 0"
+  },
+  "keywords": [
+    "github-actions",
+    "javascript",
+    "education",
+    "demo"
+  ],
+  "author": "GitHub Actions Learning Repository",
+  "license": "MIT",
+  "dependencies": {
+    "@actions/core": "^1.10.1",
+    "@actions/github": "^6.0.0"
+  }
+}

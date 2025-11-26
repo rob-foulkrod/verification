@@ -1,0 +1,63 @@
+# JavaScript Action Definition
+# ============================
+# This file defines a JavaScript action that runs on Node.js 20.
+# JavaScript actions execute directly on the runner and can use npm packages.
+
+name: 'Demo JavaScript Action'
+
+# Description for documentation and marketplace
+description: 'Educational JavaScript action demonstrating @actions/core, @actions/github, and custom logic'
+
+# Author information
+author: 'GitHub Actions Learning Repository'
+
+# Branding for GitHub Marketplace
+branding:
+  icon: 'code'
+  color: 'yellow'
+
+# INPUTS: Parameters this action accepts
+inputs:
+  input-text:
+    description: 'Text to process (analyze, transform, or validate)'
+    required: true
+    # No default - this is a required input
+  
+  operation-type:
+    description: 'Type of operation: analyze, transform, or validate'
+    required: false
+    default: 'analyze'
+
+# OUTPUTS: Values this action produces
+outputs:
+  processed-text:
+    description: 'The processed text result (JSON format)'
+  
+  operation-type:
+    description: 'The operation that was performed'
+  
+  timestamp:
+    description: 'ISO 8601 timestamp when the operation completed'
+  
+  metadata:
+    description: 'Additional metadata about the operation (JSON format)'
+
+# RUNS: Execution configuration for JavaScript actions
+runs:
+  # 'node20' means this action runs on Node.js 20
+  # Other options: 'node16', 'composite', 'docker'
+  # Node.js 20 is the current recommended version
+  using: 'node20'
+  
+  # Main entry point - the JavaScript file to execute
+  main: 'index.js'
+  
+  # Optional: Post-execution cleanup script
+  # This runs after the main action completes, even if it fails
+  # Useful for cleanup tasks like removing temp files
+  # post: 'cleanup.js'
+  
+  # Optional: Pre-execution setup script
+  # This runs before the main action
+  # Useful for setup tasks or validation
+  # pre: 'setup.js'

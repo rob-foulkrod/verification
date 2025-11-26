@@ -1,0 +1,71 @@
+# Docker Container Action Definition
+# ===================================
+# This file defines a Docker container action.
+# Docker actions run in an isolated container with full control over the environment.
+
+name: 'Demo Docker Container Action'
+
+# Description for documentation
+description: 'Educational Docker action demonstrating containerized execution with Alpine Linux best practices'
+
+# Author information
+author: 'GitHub Actions Learning Repository'
+
+# Branding for GitHub Marketplace
+branding:
+  icon: 'box'
+  color: 'purple'
+
+# INPUTS: Parameters passed to the container
+inputs:
+  message:
+    description: 'Message to process in the container'
+    required: true
+  
+  process-type:
+    description: 'Type of processing: echo, reverse, or count'
+    required: false
+    default: 'echo'
+  
+  color-output:
+    description: 'Whether to colorize output (true/false)'
+    required: false
+    default: 'true'
+
+# OUTPUTS: Values produced by the container
+outputs:
+  result:
+    description: 'The processed result from the container'
+  
+  container-info:
+    description: 'Information about the container environment'
+  
+  timestamp:
+    description: 'Processing timestamp'
+
+# RUNS: Docker container configuration
+runs:
+  # 'docker' means this action runs in a Docker container
+  using: 'docker'
+  
+  # Dockerfile location (relative to action.yml)
+  # GitHub Actions will build this image when the action runs
+  image: 'Dockerfile'
+  
+  # Optional: Use a pre-built image instead
+  # image: 'docker://alpine:3.18'
+  
+  # Arguments passed to the container's ENTRYPOINT
+  # These are accessible as $1, $2, $3, etc. in the entrypoint script
+  # We pass the input values to the container
+  args:
+    - ${{ inputs.message }}
+    - ${{ inputs.process-type }}
+    - ${{ inputs.color-output }}
+  
+  # Optional: Environment variables for the container
+  # env:
+  #   CUSTOM_VAR: 'value'
+  
+  # Optional: Set the entrypoint (overrides Dockerfile ENTRYPOINT)
+  # entrypoint: '/entrypoint.sh'
