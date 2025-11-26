@@ -253,7 +253,10 @@ jobs:
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
           echo "Result: ${{ steps.docker-action.outputs.result }}"
           echo "Timestamp: ${{ steps.docker-action.outputs.timestamp }}"
-          echo "Container Info: ${{ steps.docker-action.outputs.container-info }}"
+          echo "OS: ${{ steps.docker-action.outputs.os }}"
+          echo "Shell: ${{ steps.docker-action.outputs.shell }}"
+          echo "Process Type: ${{ steps.docker-action.outputs.process-type }}"
+          echo "PWD: ${{ steps.docker-action.outputs.pwd }}"
           echo ""
       
       # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
