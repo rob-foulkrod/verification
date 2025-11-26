@@ -68,7 +68,7 @@ LABEL org.opencontainers.image.version="1.0.0"
 
 RUN apk add --no-cache \
     bash=~5.2 \
-    curl=~8.5 \
+    curl \
     jq=~1.6 \
     ca-certificates \
     coreutils \
