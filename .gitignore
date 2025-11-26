@@ -301,6 +301,9 @@ FakesAssemblies/
 .ntvs_analysis.dat
 node_modules/
 
+# Exception: Include node_modules for GitHub Actions (they need dependencies committed)
+!action-javascript/node_modules/
+
 # Visual Studio 6 build log
 *.plg
 

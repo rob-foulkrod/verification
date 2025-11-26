@@ -1,0 +1,373 @@
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# GitHub Actions Demo Workflow - Educational Orchestration
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#
+# This workflow demonstrates how to orchestrate all three types of GitHub Actions:
+# 1. Composite Action (shell-based, no code)
+# 2. JavaScript Action (Node.js, using @actions/core)
+# 3. Docker Container Action (Alpine Linux, isolated environment)
+#
+# Key Learning Objectives:
+# • Understanding workflow_dispatch (manual triggering)
+# • Using local actions with relative paths (./action-name)
+# • Passing inputs to actions
+# • Accessing action outputs
+# • Chaining actions together
+# • Best practices for workflow organization
+#
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+name: 'Demo Workflow - Action Orchestration'
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# TRIGGERS - When this workflow runs
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+on:
+  # workflow_dispatch: Manual trigger from GitHub UI
+  # This allows you to run the workflow on-demand with custom inputs
+  workflow_dispatch:
+    inputs:
+      user-name:
+        description: 'Your name (used by all actions)'
+        required: false
+        default: 'GitHub Actions Learner'
+        type: string
+      
+      greeting-style:
+        description: 'Style of greeting (for composite action)'
+        required: false
+        default: 'casual'
+        type: choice
+        options:
+          - casual
+          - formal
+          - excited
+      
+      js-operation:
+        description: 'JavaScript operation type'
+        required: false
+        default: 'analyze'
+        type: choice
+        options:
+          - analyze
+          - transform
+          - validate
+      
+      docker-process:
+        description: 'Docker processing type'
+        required: false
+        default: 'reverse'
+        type: choice
+        options:
+          - echo
+          - reverse
+          - count
+          - uppercase
+          - lowercase
+  
+  # Optional: Also run on push to main (for testing)
+  # push:
+  #   branches: [ main ]
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# PERMISSIONS - What this workflow can access
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# Explicitly define permissions (security best practice)
+# Read-only by default, grant only what's needed
+permissions:
+  contents: read  # Can read repository contents
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# JOBS - The work to be done
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+jobs:
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  # JOB 1: Introduction
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  
+  introduction:
+    name: 'Introduction & Setup'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Display Welcome Message
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🎓 Welcome to GitHub Actions Learning Repository!"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          echo "This workflow demonstrates three types of GitHub Actions:"
+          echo ""
+          echo "1️⃣  COMPOSITE ACTION - Shell-based, no code required"
+          echo "2️⃣  JAVASCRIPT ACTION - Node.js with @actions/core"
+          echo "3️⃣  DOCKER ACTION - Containerized, isolated environment"
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "📥 Your inputs:"
+          echo "   • Name: ${{ inputs.user-name }}"
+          echo "   • Greeting Style: ${{ inputs.greeting-style }}"
+          echo "   • JS Operation: ${{ inputs.js-operation }}"
+          echo "   • Docker Process: ${{ inputs.docker-process }}"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+      
+      - name: Explain workflow_dispatch
+        run: |
+          echo "💡 About workflow_dispatch:"
+          echo ""
+          echo "workflow_dispatch is a trigger that allows manual execution."
+          echo ""
+          echo "✨ Benefits:"
+          echo "   • Run workflows on-demand from GitHub UI"
+          echo "   • Accept user inputs for customization"
+          echo "   • Great for deployments, testing, and demos"
+          echo "   • Can be triggered via GitHub API/CLI"
+          echo ""
+          echo "📍 How to use:"
+          echo "   1. Go to Actions tab"
+          echo "   2. Select this workflow from the left"
+          echo "   3. Click 'Run workflow' button"
+          echo "   4. Fill in inputs (optional)"
+          echo "   5. Click 'Run workflow' to start"
+          echo ""
+
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  # JOB 2: Run Actions - Orchestrates all three action types
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  
+  run-actions:
+    name: 'Run All Action Types'
+    runs-on: ubuntu-latest
+    needs: introduction  # Wait for introduction job to complete
+    
+    # Outputs from this job (can be used by dependent jobs)
+    outputs:
+      composite-greeting: ${{ steps.composite-action.outputs.greeting-message }}
+      js-result: ${{ steps.javascript-action.outputs.processed-text }}
+      docker-result: ${{ steps.docker-action.outputs.result }}
+    
+    steps:
+      # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      # Step 0: Checkout Repository
+      # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        # Why checkout?
+        # • Local actions (./action-name) need the repository code
+        # • Workflow can access action.yml and scripts
+        # • Without this, actions won't be found
+      
+      # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      # Step 1: Composite Action
+      # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      
+      - name: '1️⃣  Run Composite Action'
+        id: composite-action
+        uses: ./action-composite  # Relative path to local action
+        with:
+          who-to-greet: ${{ inputs.user-name }}
+          greeting-style: ${{ inputs.greeting-style }}
+        # Notes:
+        # • 'uses: ./path' references a local action
+        # • 'id' allows referencing outputs later
+        # • 'with' passes inputs to the action
+      
+      - name: Display Composite Action Output
+        run: |
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "📤 Composite Action Outputs:"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "Greeting: ${{ steps.composite-action.outputs.greeting-message }}"
+          echo "Timestamp: ${{ steps.composite-action.outputs.timestamp }}"
+          echo ""
+        # Accessing outputs:
+        # • Format: ${{ steps.<step-id>.outputs.<output-name> }}
+        # • Step must have an 'id' to reference it
+      
+      # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      # Step 2: JavaScript Action
+      # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      
+      - name: 'Setup Node.js for JavaScript Action'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+        # Why setup-node?
+        # • JavaScript actions need Node.js runtime
+        # • Ensures the correct Node version is available
+        # • Caches node_modules for faster runs
+      
+      - name: 'Install JavaScript Action Dependencies'
+        run: |
+          cd action-javascript
+          npm install
+        # Install @actions/core and @actions/github
+        # These are required by the JavaScript action
+      
+      - name: '2️⃣  Run JavaScript Action'
+        id: javascript-action
+        uses: ./action-javascript
+        with:
+          input-text: ${{ inputs.user-name }}
+          operation-type: ${{ inputs.js-operation }}
+      
+      - name: Display JavaScript Action Output
+        run: |
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "📤 JavaScript Action Outputs:"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "Operation: ${{ steps.javascript-action.outputs.operation-type }}"
+          echo "Result: ${{ steps.javascript-action.outputs.processed-text }}"
+          echo "Timestamp: ${{ steps.javascript-action.outputs.timestamp }}"
+          echo "Metadata: ${{ steps.javascript-action.outputs.metadata }}"
+          echo ""
+      
+      # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      # Step 3: Docker Container Action
+      # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      
+      - name: '3️⃣  Run Docker Container Action'
+        id: docker-action
+        uses: ./action-docker
+        with:
+          message: ${{ inputs.user-name }}
+          process-type: ${{ inputs.docker-process }}
+          color-output: 'true'
+        # Notes about Docker actions:
+        # • GitHub Actions builds the Dockerfile automatically
+        # • First run is slower (builds image)
+        # • Subsequent runs use cached layers (faster)
+        # • Only works on Linux runners
+      
+      - name: Display Docker Action Output
+        run: |
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "📤 Docker Action Outputs:"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "Result: ${{ steps.docker-action.outputs.result }}"
+          echo "Timestamp: ${{ steps.docker-action.outputs.timestamp }}"
+          echo "Container Info: ${{ steps.docker-action.outputs.container-info }}"
+          echo ""
+      
+      # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      # Step 4: Demonstrate Using Outputs Together
+      # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      
+      - name: Combine Results from All Actions
+        run: |
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🎯 Combined Results Summary"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          echo "📝 Summary of all actions:"
+          echo ""
+          echo "1️⃣  Composite Action said:"
+          echo "    '${{ steps.composite-action.outputs.greeting-message }}'"
+          echo ""
+          echo "2️⃣  JavaScript Action processed:"
+          echo "    ${{ steps.javascript-action.outputs.processed-text }}"
+          echo ""
+          echo "3️⃣  Docker Action resulted in:"
+          echo "    '${{ steps.docker-action.outputs.result }}'"
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+        # This demonstrates:
+        # • Accessing multiple action outputs
+        # • Combining data from different action types
+        # • Using outputs in subsequent steps
+
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  # JOB 3: Summary & Learning Points
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  
+  summary:
+    name: 'Summary & Next Steps'
+    runs-on: ubuntu-latest
+    needs: run-actions  # Wait for all actions to complete
+    
+    steps:
+      - name: Display Learning Summary
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🎓 Congratulations! You've completed the demo!"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          echo "✅ What you learned:"
+          echo ""
+          echo "1️⃣  COMPOSITE ACTIONS"
+          echo "   • Bundle shell commands into reusable actions"
+          echo "   • No code required, just YAML"
+          echo "   • Fast execution, no overhead"
+          echo "   • Perfect for setup scripts and common tasks"
+          echo ""
+          echo "2️⃣  JAVASCRIPT ACTIONS"
+          echo "   • Write custom logic in Node.js"
+          echo "   • Use @actions/core and @actions/github"
+          echo "   • Access npm ecosystem"
+          echo "   • Great for complex data processing"
+          echo ""
+          echo "3️⃣  DOCKER CONTAINER ACTIONS"
+          echo "   • Complete environment control"
+          echo "   • Isolated execution in containers"
+          echo "   • Use any language or tool"
+          echo "   • Best for specific dependencies"
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🎯 Key Concepts:"
+          echo ""
+          echo "• workflow_dispatch: Manual triggering with inputs"
+          echo "• Local actions: Using ./path for repo actions"
+          echo "• Action inputs: Passing data with 'with:'"
+          echo "• Action outputs: Reading data with steps.<id>.outputs"
+          echo "• Job dependencies: Controlling execution order with 'needs:'"
+          echo "• Permissions: Explicit security with 'permissions:'"
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "📚 Next Steps:"
+          echo ""
+          echo "1. Read the README files in each action directory"
+          echo "2. Modify the actions and see what happens"
+          echo "3. Try different input combinations"
+          echo "4. Create your own custom action"
+          echo "5. Publish your action to GitHub Marketplace"
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🌟 Resources:"
+          echo ""
+          echo "• GitHub Actions Docs: https://docs.github.com/actions"
+          echo "• Action Marketplace: https://github.com/marketplace?type=actions"
+          echo "• Community Forum: https://github.community/c/actions"
+          echo ""
+          echo "Happy automating! 🚀"
+          echo ""
+      
+      - name: Display Action Comparison
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "📊 Action Type Comparison"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          echo "┌─────────────┬──────────────┬────────────┬────────────┐"
+          echo "│ Feature     │ Composite    │ JavaScript │ Docker     │"
+          echo "├─────────────┼──────────────┼────────────┼────────────┤"
+          echo "│ Language    │ Shell/YAML   │ Node.js    │ Any        │"
+          echo "│ Startup     │ Fast         │ Fast       │ Slow       │"
+          echo "│ Isolation   │ Low          │ Low        │ High       │"
+          echo "│ Complexity  │ Simple       │ Medium     │ Complex    │"
+          echo "│ Code Req.   │ No           │ Yes        │ Yes        │"
+          echo "│ npm Pkgs    │ No           │ Yes        │ No*        │"
+          echo "│ Deps Ctrl   │ Limited      │ Medium     │ Complete   │"
+          echo "│ Cross-plat  │ Yes          │ Yes        │ Linux only │"
+          echo "└─────────────┴──────────────┴────────────┴────────────┘"
+          echo ""
+          echo "* Docker actions can install anything in the container"
+          echo ""

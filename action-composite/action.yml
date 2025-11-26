@@ -1,0 +1,158 @@
+# Composite Action Definition
+# =========================
+# This file defines a composite action, which is the simplest type of GitHub Action.
+# Composite actions allow you to combine multiple workflow steps into a single reusable action.
+
+name: 'Demo Composite Action'
+
+# Description appears in the GitHub Marketplace and action documentation
+# Make it clear and educational!
+description: 'Educational composite action demonstrating how to bundle multiple steps together'
+
+# Author information (optional but recommended for public actions)
+author: 'GitHub Actions Learning Repository'
+
+# Branding for the GitHub Marketplace (optional)
+# Icons: https://feathericons.com/
+# Colors: white, yellow, blue, green, orange, red, purple, gray-dark
+branding:
+  icon: 'package'
+  color: 'blue'
+
+# INPUTS: Define parameters that can be passed to your action
+# These make your action flexible and reusable
+inputs:
+  who-to-greet:
+    # Description of what this input does
+    description: 'The name of the person to greet'
+    # Is this input mandatory? If false, you should provide a default
+    required: false
+    # Default value if not provided by the caller
+    default: 'World'
+  
+  greeting-style:
+    description: 'Style of greeting (formal, casual, excited)'
+    required: false
+    default: 'casual'
+
+# OUTPUTS: Define values that this action will produce
+# Other steps can use these outputs via ${{ steps.<step-id>.outputs.<output-name> }}
+outputs:
+  greeting-message:
+    # Description of what this output contains
+    description: 'The full greeting message that was generated'
+    # For composite actions, outputs must reference outputs from steps
+    # The syntax is: ${{ steps.<step-id>.outputs.<output-name> }}
+    value: ${{ steps.generate-greeting.outputs.message }}
+  
+  timestamp:
+    description: 'Timestamp when the greeting was generated'
+    value: ${{ steps.generate-greeting.outputs.timestamp }}
+
+# RUNS: Defines how this action executes
+runs:
+  # 'composite' means this action is composed of multiple steps
+  # Other options are 'node20' (JavaScript) and 'docker' (Container)
+  using: 'composite'
+  
+  # Steps are executed sequentially, just like in a workflow
+  steps:
+    # Step 1: Educational message explaining what's happening
+    - name: Explain Composite Actions
+      shell: bash
+      run: |
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "🎓 COMPOSITE ACTION: What's happening?"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo ""
+        echo "✨ This is a COMPOSITE ACTION - the simplest action type!"
+        echo ""
+        echo "📚 Key Concepts:"
+        echo "   • Composite actions bundle multiple steps together"
+        echo "   • They run directly on the workflow runner (no container)"
+        echo "   • Perfect for reusable shell scripts and commands"
+        echo "   • Can accept inputs and produce outputs"
+        echo "   • Defined entirely in YAML (no code required!)"
+        echo ""
+        echo "🔍 Why use composite actions?"
+        echo "   • Reduce duplication across workflows"
+        echo "   • Share common setup steps across projects"
+        echo "   • Keep workflows DRY (Don't Repeat Yourself)"
+        echo "   • Faster than Docker actions (no container overhead)"
+        echo ""
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    
+    # Step 2: Display received inputs
+    # Note: We access inputs via ${{ inputs.<input-name> }}
+    - name: Display Input Values
+      shell: bash
+      run: |
+        echo ""
+        echo "📥 Inputs received by this action:"
+        echo "   who-to-greet: ${{ inputs.who-to-greet }}"
+        echo "   greeting-style: ${{ inputs.greeting-style }}"
+        echo ""
+    
+    # Step 3: Generate the greeting based on style
+    # This step produces outputs that will be exposed by the action
+    - name: Generate Greeting
+      id: generate-greeting
+      shell: bash
+      run: |
+        # Access inputs using the ${{ inputs.name }} syntax
+        NAME="${{ inputs.who-to-greet }}"
+        STYLE="${{ inputs.greeting-style }}"
+        
+        # Generate different greetings based on style
+        case "$STYLE" in
+          formal)
+            MESSAGE="Good day, $NAME. It is a pleasure to make your acquaintance."
+            ;;
+          excited)
+            MESSAGE="HEY $NAME!!! 🎉 SO GREAT TO SEE YOU!!!"
+            ;;
+          casual|*)
+            MESSAGE="Hey $NAME! Nice to meet you!"
+            ;;
+        esac
+        
+        # Get current timestamp
+        TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+        
+        # Set outputs using GitHub Actions syntax
+        # GITHUB_OUTPUT is a special file path provided by GitHub Actions
+        # Format: <output-name>=<value>
+        echo "message=$MESSAGE" >> $GITHUB_OUTPUT
+        echo "timestamp=$TIMESTAMP" >> $GITHUB_OUTPUT
+        
+        # Also display the greeting
+        echo ""
+        echo "💬 Generated greeting: $MESSAGE"
+        echo "🕐 Timestamp: $TIMESTAMP"
+    
+    # Step 4: Demonstrate accessing step outputs within the action
+    - name: Use Step Output
+      shell: bash
+      run: |
+        echo ""
+        echo "🔄 Demonstrating output access within the action:"
+        echo "   The greeting was: ${{ steps.generate-greeting.outputs.message }}"
+        echo "   Generated at: ${{ steps.generate-greeting.outputs.timestamp }}"
+        echo ""
+    
+    # Step 5: Final educational message
+    - name: Wrap Up
+      shell: bash
+      run: |
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "✅ Composite Action Complete!"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo ""
+        echo "💡 What you learned:"
+        echo "   ✓ How to define inputs with descriptions and defaults"
+        echo "   ✓ How to produce outputs using GITHUB_OUTPUT"
+        echo "   ✓ How to run multiple steps in sequence"
+        echo "   ✓ How to access inputs and outputs between steps"
+        echo ""
+        echo "🎯 Next: Check out the JavaScript action to see code-based logic!"
+        echo ""
