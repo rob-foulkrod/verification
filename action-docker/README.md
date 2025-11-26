@@ -173,7 +173,7 @@ This Docker action demonstrates:
 3. **Tool Installation**: bash, curl, jq, ca-certificates
 4. **Argument Handling**: Three inputs with defaults
 5. **Processing Logic**: Five operation types
-6. **Output Generation**: result, timestamp, container-info
+6. **Output Generation**: result, timestamp, os, shell, process-type, pwd
 7. **Educational Output**: Explains what's happening
 
 **Operations:**
@@ -200,7 +200,10 @@ In a workflow:
   run: |
     echo "Result: ${{ steps.docker.outputs.result }}"
     echo "Time: ${{ steps.docker.outputs.timestamp }}"
-    echo "Info: ${{ steps.docker.outputs.container-info }}"
+    echo "OS: ${{ steps.docker.outputs.os }}"
+    echo "Shell: ${{ steps.docker.outputs.shell }}"
+    echo "Process Type: ${{ steps.docker.outputs.process-type }}"
+    echo "PWD: ${{ steps.docker.outputs.pwd }}"
 ```
 
 ## 💡 Best Practices
