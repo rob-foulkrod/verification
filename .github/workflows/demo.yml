@@ -67,8 +67,8 @@ on:
           - lowercase
   
   # Optional: Also run on push to main (for testing)
-  # push:
-  #   branches: [ main ]
+  push:
+    branches: [ main ]
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # PERMISSIONS - What this workflow can access
