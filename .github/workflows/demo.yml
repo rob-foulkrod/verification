@@ -213,7 +213,7 @@ jobs:
         id: javascript-action
         uses: ./action-javascript
         with:
-          input-text: ${{ inputs.user-name }}
+          input-text: ${{ inputs.user-name || 'GitHub Actions Learner' }}
           operation-type: ${{ inputs.js-operation }}
       
       - name: Display JavaScript Action Output
