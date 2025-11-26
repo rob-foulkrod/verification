@@ -37,11 +37,20 @@ outputs:
   result:
     description: 'The processed result from the container'
   
-  container-info:
-    description: 'Information about the container environment'
-  
   timestamp:
     description: 'Processing timestamp'
+  
+  os:
+    description: 'Operating system information'
+  
+  shell:
+    description: 'Shell version information'
+  
+  process-type:
+    description: 'Type of processing performed'
+  
+  pwd:
+    description: 'Current working directory'
 
 # RUNS: Docker container configuration
 runs:

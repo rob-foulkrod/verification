@@ -196,16 +196,10 @@ echo ""
 # Generate timestamp
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
-# Create container info JSON
-CONTAINER_INFO=$(cat <<EOF
-{
-  "os": "$(cat /etc/os-release | grep PRETTY_NAME | cut -d '"' -f 2)",
-  "shell": "$(bash --version | head -n 1)",
-  "process_type": "$PROCESS_TYPE",
-  "pwd": "$(pwd)"
-}
-EOF
-)
+# Extract container information
+OS_INFO=$(cat /etc/os-release | grep PRETTY_NAME | cut -d '"' -f 2)
+SHELL_INFO=$(bash --version | head -n 1)
+PWD_INFO=$(pwd)
 
 # Set outputs using GITHUB_OUTPUT
 # GITHUB_OUTPUT is a special file path provided by GitHub Actions
@@ -221,16 +215,25 @@ echo ""
 if [ -n "${GITHUB_OUTPUT:-}" ]; then
   echo "result=$RESULT" >> "$GITHUB_OUTPUT"
   echo "timestamp=$TIMESTAMP" >> "$GITHUB_OUTPUT"
-  echo "container-info=$CONTAINER_INFO" >> "$GITHUB_OUTPUT"
+  echo "os=$OS_INFO" >> "$GITHUB_OUTPUT"
+  echo "shell=$SHELL_INFO" >> "$GITHUB_OUTPUT"
+  echo "process-type=$PROCESS_TYPE" >> "$GITHUB_OUTPUT"
+  echo "pwd=$PWD_INFO" >> "$GITHUB_OUTPUT"
   print_colored "$GREEN" "   ✓ result"
   print_colored "$GREEN" "   ✓ timestamp"
-  print_colored "$GREEN" "   ✓ container-info"
+  print_colored "$GREEN" "   ✓ os"
+  print_colored "$GREEN" "   ✓ shell"
+  print_colored "$GREEN" "   ✓ process-type"
+  print_colored "$GREEN" "   ✓ pwd"
 else
   echo "⚠️  GITHUB_OUTPUT not set (running outside GitHub Actions)"
   echo "Outputs would be:"
   echo "   result=$RESULT"
   echo "   timestamp=$TIMESTAMP"
-  echo "   container-info=$CONTAINER_INFO"
+  echo "   os=$OS_INFO"
+  echo "   shell=$SHELL_INFO"
+  echo "   process-type=$PROCESS_TYPE"
+  echo "   pwd=$PWD_INFO"
 fi
 
 echo ""
